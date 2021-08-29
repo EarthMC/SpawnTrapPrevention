@@ -1,5 +1,7 @@
 package net.earthmc.spawntrapprevention;
 
+import com.gmail.goosius.siegewar.utils.SiegeWarDistanceUtil;
+import com.palmergames.bukkit.towny.TownySettings;
 import com.palmergames.bukkit.towny.event.damage.TownBlockPVPTestEvent;
 import com.palmergames.bukkit.towny.exceptions.TownyException;
 import com.palmergames.bukkit.towny.object.Town;
@@ -24,13 +26,13 @@ public class SpawnTrapPrevention extends JavaPlugin implements Listener {
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.NORMAL)
     public void onTownBlockTestPVP(TownBlockPVPTestEvent event) {
-        if (isCloseToNationSpawn(event.getTownBlock().getWorldCoord()))
+        if (isCloseToNationSpawn(event.getTownBlock().getWorldCoord()) && !SiegeWarDistanceUtil.isLocationInActiveSiegeZone(toLocation(event.getTownBlock().getWorldCoord())))
             event.setPvp(false);
     }
 
     @EventHandler(priority = EventPriority.NORMAL)
     public void onPlayerDeath(PlayerDeathEvent event) {
-        if (isCloseToNationSpawn(event.getEntity().getLocation())) {
+        if (isCloseToNationSpawn(event.getEntity().getLocation()) && !SiegeWarDistanceUtil.isLocationInActiveSiegeZone(event.getEntity().getLocation())) {
             event.setKeepInventory(true);
             event.setKeepLevel(true);
             event.getDrops().clear();
@@ -67,5 +69,10 @@ public class SpawnTrapPrevention extends JavaPlugin implements Listener {
         coords.add(centre.add(1, 1));
 
         return coords;
+    }
+
+    private static Location toLocation(WorldCoord coord) {
+        int tbSize = TownySettings.getTownBlockSize();
+        return new Location(coord.getBukkitWorld(), coord.getX() * tbSize, 64, coord.getZ() * tbSize);
     }
 }

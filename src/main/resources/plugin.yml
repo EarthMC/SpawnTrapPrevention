@@ -4,4 +4,4 @@ author: Warriorrr
 name: SpawnTrapPrevention
 prefix: SpawnTrapPrevention
 version: ${project.version}
-depend: [Towny]
+depend: [Towny, SiegeWar]
